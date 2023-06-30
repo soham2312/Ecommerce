@@ -41,7 +41,12 @@
     </div> <!-- rating-wrap.// -->
     
     <div class="mb-3"> 
-        <var class="price h4">${{product.price}}.00</var> 
+        <var class="price h4">${% if updated_price %}
+          {{updated_price}}
+          {% else %}
+          {{product.price}}
+          {% endif %}
+          .00</var> 
 
     </div> <!-- price-detail-wrap .// -->
     
@@ -72,17 +77,22 @@
                   </div>
                 </div>
             </div> <!-- col.// -->
+            
+            {% if product.size.count %}
             <div class="form-group col-md">
                     <label>Select size</label>
                     <div class="mt-1">
                       {% for size in product.size.all %}
+                       {{selected_size}}
+                      <input type="hidden" name="size" value="{{size.size_name}}">
                         <label class="custom-control custom-radio custom-control-inline">
-                          <input type="radio" name="select_size" checked="" class="custom-control-input">
+                          <input type="radio" onchange="get_correct_price('{{size.size_name}}')"  name="select_size"   class="custom-control-input">
                           <div class="custom-control-label">{{size.size_name}}</div>
                         </label>
                         {% endfor %} 
                     </div>
-            </div> <!-- col.// -->
+            </div>
+            {% endif %} <!-- col.// -->
         </div> <!-- row.// -->
     
         <a href="#" class="btn  btn-primary"> Buy now </a>
@@ -96,4 +106,9 @@
 
     </div>
     </section>
+    <script>
+      function get_correct_price(size){
+        window.location.href=window.location.pathname +`?size=${size}`
+      }
+    </script>
 {% endblock %}
