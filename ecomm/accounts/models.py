@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import uuid
 from base.emails import send_account_activation_email
+from products.models import Product,ColorVariant,SizeVariant
 
 
 class Profile(BaseModel):
@@ -12,6 +13,43 @@ class Profile(BaseModel):
     is_email_verified=models.BooleanField(default=False)
     email_token=models.CharField(max_length=100,null=True,blank=True)
     profile_image=models.ImageField(upload_to="profile")
+
+    def get_cart_count(self):
+        return Cartitems.objects.filter(cart__user=self.user,cart__is_paid=False).count()
+
+
+class Cart(BaseModel):
+    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="carts")
+    is_paid=models.BooleanField(default=False)
+
+    def get_cart_total(self):
+        cart_items=self.cart_items.all()
+        price=[]
+        for cart_item in cart_items:
+            price.append(cart_item.get_product_price())
+            if cart_item.color:
+                price.append(cart_item.color.price)
+            if cart_item.size:
+                price.append(cart_item.size.price)
+
+        print(sum(price))
+        return sum(price)
+
+class Cartitems(BaseModel):
+    cart=models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="cart_items")
+    product=models.ForeignKey(Product,on_delete=models.SET_NULL,null=True,blank=True)
+    color=models.ForeignKey(ColorVariant,on_delete=models.SET_NULL,null=True,blank=True)
+    size=models.ForeignKey(SizeVariant,on_delete=models.SET_NULL,null=True,blank=True)
+
+    def get_product_price(self):
+        price=[self.product.price]
+        if self.color:
+            price.append(self.color.price)
+        if self.size:
+            price.append(self.size.price)
+        return sum(price)
+
+
 
 @receiver(post_save,sender=User)
 def send_email_token(sender,instance,created,**kwargs):

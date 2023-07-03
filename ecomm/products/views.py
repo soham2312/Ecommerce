@@ -1,11 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from products.models import *
+
 
 # Create your views here.
 
 
 
 def get_products(request , slug):
+    print(request.user)
     try:
         product=Product.objects.get(slug=slug)
         context={'product':product}
@@ -18,3 +20,4 @@ def get_products(request , slug):
     except Exception as e:
         print(e)
         
+

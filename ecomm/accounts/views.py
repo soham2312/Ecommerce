@@ -3,8 +3,10 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login
-from accounts.models import Profile
+from accounts.models import *
 from django.http import HttpResponse
+from products.models import *
+from django.http import HttpResponseRedirect
 
 
 # Create your views here.
@@ -49,6 +51,18 @@ def register_page(request):
     
     return render(request,'accounts/register.html')
 
+def remove_cart(request,cart_item_uid):
+    try:
+        cart_item=Cartitems.objects.get(uid=cart_item_uid)
+        cart_item.delete()
+    except Exception as e:
+        print(e)
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def cart(request):
+    context={'cart':Cart.objects.filter(user=request.user,is_paid=False)}
+    return render(request,'accounts/cart.html',context=context)
+
 def activate_email(request , email_token):
     try:
         user = Profile.objects.get(email_token= email_token)
@@ -57,3 +71,17 @@ def activate_email(request , email_token):
         return redirect('/')
     except Exception as e:
         return HttpResponse('Invalid Email token')
+    
+def add_to_cart(request,uid):
+    variant=request.GET.get('variant')
+    product=Product.objects.get(uid=uid)
+    user=request.user
+    cart,_=Cart.objects.get_or_create(user=user,is_paid=False)
+    cart_item=Cartitems.objects.create(cart=cart,product=product)
+
+    if variant:
+        variant=request.GET.get('variant')
+        size=SizeVariant.objects.get(size_name=variant)
+        cart_item.size=size
+        cart_item.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
