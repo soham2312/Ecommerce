@@ -73,14 +73,14 @@ def activate_email(request , email_token):
         return HttpResponse('Invalid Email token')
     
 def add_to_cart(request,uid):
-    variant=request.GET.get('variant')
+    variant=request.GET.get('size')
     product=Product.objects.get(uid=uid)
     user=request.user
     cart,_=Cart.objects.get_or_create(user=user,is_paid=False)
     cart_item=Cartitems.objects.create(cart=cart,product=product)
 
     if variant:
-        variant=request.GET.get('variant')
+        variant=request.GET.get('size')
         size=SizeVariant.objects.get(size_name=variant)
         cart_item.size=size
         cart_item.save()

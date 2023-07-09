@@ -27,12 +27,7 @@ class Cart(BaseModel):
         price=[]
         for cart_item in cart_items:
             price.append(cart_item.get_product_price())
-            if cart_item.color:
-                price.append(cart_item.color.price)
-            if cart_item.size:
-                price.append(cart_item.size.price)
-
-        print(sum(price))
+            
         return sum(price)
 
 class Cartitems(BaseModel):
@@ -43,8 +38,8 @@ class Cartitems(BaseModel):
 
     def get_product_price(self):
         price=[self.product.price]
-        if self.color:
-            price.append(self.color.price)
+        # if self.color:
+        #     price.append(self.color.price)
         if self.size:
             price.append(self.size.price)
         return sum(price)

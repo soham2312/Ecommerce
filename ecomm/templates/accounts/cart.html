@@ -17,42 +17,13 @@
     </tr>
     </thead>
     <tbody>
-        <tr>
-            <td>
-                <figure class="itemside">
-                    <div class="aside"><img src="images/items/1.jpg" class="img-sm"></div>
-                    <figcaption class="info">
-                        <a href="#" class="title text-dark">Some name of item goes here nice</a>
-                        <p class="text-muted small">Size: XL, Color: blue, <br> Brand: Gucci</p>
-                    </figcaption>
-                </figure>
-            </td>
-            <td> 
-                <select class="form-control">
-                    <option>1</option>
-                    <option>2</option>	
-                    <option>3</option>	
-                    <option>4</option>	
-                </select> 
-            </td>
-            <td> 
-                <div class="price-wrap"> 
-                    <var class="price">$1156.00</var> 
-                    <small class="text-muted">$315.20 each </small> 
-                </div> <!-- price-wrap .// -->
-            </td>
-            <td class="text-right"> 
-            <a data-original-title="Save to Wishlist" title="" href="" class="btn btn-light" data-toggle="tooltip"> <i class="fa fa-heart"></i></a> 
-            <a href="" class="btn btn-light"> Remove</a>
-            </td>
-        </tr>
-    {% for cart_item in cart_items.all %}
+    {% for cart_item in request.user.carts.cart_items.all %}
     <tr>
         <td>
             <figure class="itemside">
-                <div class="aside"><img src="images/items/2.jpg" class="img-sm"></div>
+                <div class="aside"><img src="/media/{{product.product_images.first.image}}" class="img-sm"></div>
                 <figcaption class="info">
-                    <a href="#" class="title text-dark">{{cart_item.product.product_name}}</a>
+                    <a href="" class="title text-dark">{{cart_item.product.product_name}}</a>
                     <p class="text-muted small">Size: {{cart_item.size}}, Color: {{cart_item.color}}, <br> Brand: Gucci</p>
                 </figcaption>
             </figure>
@@ -67,7 +38,7 @@
         </td>
         <td> 
             <div class="price-wrap"> 
-                <var class="price">${{cart_item.get_correct_price}}</var> 
+                <var class="price">${{cart_item.get_product_price}}</var> 
             </div> <!-- price-wrap .// -->
         </td>
         <td class="text-right"> 
@@ -111,7 +82,7 @@
                 <div class="card-body">
                         <dl class="dlist-align">
                           <dt>Total:</dt>
-                          <dd class="text-right  h5"><strong>{{cart.get_cart_total}}</strong></dd>
+                          <dd class="text-right  h5"><strong>{{request.user.carts.get_cart_total}}</strong></dd>
                         </dl>
                         <hr>
                 </div> <!-- card-body.// -->
