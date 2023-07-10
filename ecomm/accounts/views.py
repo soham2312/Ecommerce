@@ -60,12 +60,11 @@ def remove_cart(request,cart_item_uid):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def cart(request):
-    cart_obj=Cart.objects.filter(user=request.user,is_paid=False)
-    print(cart_obj)
+    cart_obj=Cart.objects.get(user=request.user,is_paid=False)
     if request.method=='POST':
         coupon=request.POST.get('coupon')
         coupon_obj=Coupon.objects.filter(coupon_code__icontains=coupon)
-        if not coupon.exists():
+        if not coupon_obj.exists():
             messages.warning(request,'Invalid Coupon')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         if cart_obj.coupon:
@@ -77,7 +76,6 @@ def cart(request):
         if coupon_obj[0].is_expired:
             messages.warning(request,'Coupon already expired')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
- 
         cart_obj.coupon=coupon_obj[0]
         cart_obj.save()
         messages.success(request,'Coupon applied successfully')

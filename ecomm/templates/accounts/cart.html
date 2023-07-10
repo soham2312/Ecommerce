@@ -77,7 +77,7 @@
                         </div>
                     </div>
                     {% if cart.coupon %}
-                    <a href="{% url 'remove_coupon' cart.uid %}" class="btn btn-success"></a>
+                    <a href="{% url 'remove_coupon' cart.uid %}" class="btn btn-success">{{cart.coupon.coupon_code}}</a>
                     {% endif %}
                 </form>
                 </div> <!-- card-body.// -->

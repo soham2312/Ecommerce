@@ -28,9 +28,9 @@ class Cart(BaseModel):
         price=[]
         for cart_item in cart_items:
             price.append(cart_item.get_product_price())
-
+        print(self.coupon)
         if self.coupon:
-            return sum(price)-self.coupon.Discount*sum(price)/100    
+            return sum(price)-self.coupon.discount*sum(price)/100    
         return sum(price)
 
 class Cartitems(BaseModel):

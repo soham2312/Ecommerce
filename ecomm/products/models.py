@@ -55,7 +55,7 @@ class ProductImage(BaseModel):
     is_featured = models.BooleanField(default=False)
 
 class Coupon(BaseModel):
-    coupon_code = models.CharField(max_length=10)
+    coupon_code = models.CharField(max_length=100)
     discount = models.IntegerField()
     is_expired = models.BooleanField(default=False)
     minimum_amount = models.IntegerField(default=500)
