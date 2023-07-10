@@ -7,6 +7,8 @@ from accounts.models import *
 from django.http import HttpResponse
 from products.models import *
 from django.http import HttpResponseRedirect
+import razorpay
+from django.conf import settings
 
 
 # Create your views here.
@@ -78,9 +80,18 @@ def cart(request):
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         cart_obj.coupon=coupon_obj[0]
         cart_obj.save()
+
         messages.success(request,'Coupon applied successfully')
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    context={'cart':cart_obj}
+    
+    client=razorpay.Client(auth=(settings.KEY,settings.KEY_SECRET))
+
+    payment=client.order.create({'amount':cart_obj.get_cart_total()*100,'currency':'INR','payment_capture':'1'})
+    cart_obj.razorpay_order_id=payment['id']
+    
+    cart_obj.save()
+
+    context={'cart':cart_obj,'payment':payment}
     return render(request,'accounts/cart.html',context=context)
 
 def activate_email(request , email_token):

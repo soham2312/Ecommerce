@@ -142,3 +142,7 @@ EMAIL_HOST_USER = 'sohamsarode2312@outlook.com'
 EMAIL_HOST_PASSWORD = '23@Ganesh'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+
+KEY = "rzp_test_S1YeoXZ0dBoRUo"
+KEY_SECRET="4AaoCsIw5SBSkr9bePlyLVYY"

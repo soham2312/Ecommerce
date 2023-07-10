@@ -22,13 +22,15 @@ class Cart(BaseModel):
     user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="carts")
     coupon=models.ForeignKey(Coupon,on_delete=models.SET_NULL,null=True,blank=True)
     is_paid=models.BooleanField(default=False)
+    razorpay_order_id=models.CharField(max_length=100,null=True,blank=True)
+    razorpay_payment_id=models.CharField(max_length=100,null=True,blank=True)
+    razorpay_payment_signature=models.CharField(max_length=100,null=True,blank=True)
 
     def get_cart_total(self):
         cart_items=self.cart_items.all()
         price=[]
         for cart_item in cart_items:
             price.append(cart_item.get_product_price())
-        print(self.coupon)
         if self.coupon:
             if self.coupon.minimum_amount<sum(price):
                 return sum(price)-self.coupon.discount*sum(price)/100 
