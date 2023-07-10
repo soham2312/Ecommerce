@@ -42,14 +42,23 @@ class Product(BaseModel):
     def save(self,*args,**kwargs):
         self.slug = slugify(self.product_name)
         super(Product,self).save(*args,**kwargs)
-
+ 
     def __str__(self):
         return self.product_name
     
     def get_product_price_by_size(self,size):
         return self.price + self.size.get(size_name=size).price 
-
+ 
 class ProductImage(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product_images")
     image = models.ImageField(upload_to="product")
     is_featured = models.BooleanField(default=False)
+
+class Coupon(BaseModel):
+    coupon_code = models.CharField(max_length=10)
+    discount = models.IntegerField()
+    is_expired = models.BooleanField(default=False)
+    minimum_amount = models.IntegerField(default=500)
+
+    def __str__(self):
+        return self.coupon_code

@@ -60,7 +60,29 @@ def remove_cart(request,cart_item_uid):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def cart(request):
-    context={'cart':Cart.objects.filter(user=request.user,is_paid=False)}
+    cart_obj=Cart.objects.filter(user=request.user,is_paid=False)
+    print(cart_obj)
+    if request.method=='POST':
+        coupon=request.POST.get('coupon')
+        coupon_obj=Coupon.objects.filter(coupon_code__icontains=coupon)
+        if not coupon.exists():
+            messages.warning(request,'Invalid Coupon')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        if cart_obj.coupon:
+            messages.warning(request,'Coupon already applied')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        if cart_obj.get_cart_total()<coupon_obj[0].minimum_amount:
+            messages.warning(request,'Minimum amount should be {}'.format(coupon_obj[0].minimum_amount))
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        if coupon_obj[0].is_expired:
+            messages.warning(request,'Coupon already expired')
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+ 
+        cart_obj.coupon=coupon_obj[0]
+        cart_obj.save()
+        messages.success(request,'Coupon applied successfully')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    context={'cart':cart_obj}
     return render(request,'accounts/cart.html',context=context)
 
 def activate_email(request , email_token):
@@ -84,4 +106,11 @@ def add_to_cart(request,uid):
         size=SizeVariant.objects.get(size_name=variant)
         cart_item.size=size
         cart_item.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def remove_coupon(request,cart_id):
+    cart_obj=Cart.objects.filter(user=cart_id,is_paid=False)
+    cart_obj.coupon=None
+    cart_obj.save()
+    messages.success(request,'Coupon removed successfully')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
