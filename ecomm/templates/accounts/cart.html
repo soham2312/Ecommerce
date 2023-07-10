@@ -17,7 +17,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for cart_item in request.user.carts.cart_items.all %}
+    {% for cart_item in cart.cart_items.all %}
     <tr>
         <td>
             <figure class="itemside">
@@ -87,7 +87,7 @@
                 <div class="card-body">
                         <dl class="dlist-align">
                           <dt>Total:</dt>
-                          <dd class="text-right  h5"><strong>{{request.user.carts.get_cart_total}}</strong></dd>
+                          <dd class="text-right  h5"><strong>{{cart.get_cart_total}}</strong></dd>
                         </dl>
                         <hr>
                 </div> <!-- card-body.// -->
@@ -108,9 +108,7 @@
             "image": "",
             "order_id": "{{payment.id}}",
             "handler": function (response){
-                alert(response.razorpay_payment_id);
-                alert(response.razorpay_order_id);
-                alert(response.razorpay_signature)
+                window.location.href=`http://127.0.0.1:8000/accounts/success?order_id={{payment.id}}`
             },
             "theme": {
                 "color": "#F37254"

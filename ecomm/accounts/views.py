@@ -62,7 +62,13 @@ def remove_cart(request,cart_item_uid):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def cart(request):
-    cart_obj=Cart.objects.get(user=request.user,is_paid=False)
+    cart_obj=None
+    try:
+        cart_obj=Cart.objects.get(user=request.user,is_paid=False)
+    except Exception as e:
+        print(e)
+
+    print(cart_obj)
     if request.method=='POST':
         coupon=request.POST.get('coupon')
         coupon_obj=Coupon.objects.filter(coupon_code__icontains=coupon)
@@ -83,13 +89,15 @@ def cart(request):
 
         messages.success(request,'Coupon applied successfully')
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    
-    client=razorpay.Client(auth=(settings.KEY,settings.KEY_SECRET))
+    payment=None
+    if cart_obj:
+        client=razorpay.Client(auth=(settings.KEY,settings.KEY_SECRET))
 
-    payment=client.order.create({'amount':cart_obj.get_cart_total()*100,'currency':'INR','payment_capture':'1'})
-    cart_obj.razorpay_order_id=payment['id']
-    
-    cart_obj.save()
+        payment=client.order.create({'amount':cart_obj.get_cart_total()*100,'currency':'INR','payment_capture':'1'})
+        cart_obj.razorpay_order_id=payment['id']
+
+        cart_obj.save()
+    # payment=None
 
     context={'cart':cart_obj,'payment':payment}
     return render(request,'accounts/cart.html',context=context)
@@ -123,3 +131,10 @@ def remove_coupon(request,cart_id):
     cart_obj.save()
     messages.success(request,'Coupon removed successfully')
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+def success(request):
+    order_id=request.GET.get('order_id')
+    cart=Cart.objects.get(razorpay_order_id=order_id)
+    cart.is_paid=True
+    cart.save()
+    return HttpResponse('Payment Success')
