@@ -71,8 +71,8 @@ def cart(request):
             messages.warning(request,'Coupon already applied')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         if cart_obj.get_cart_total()<coupon_obj[0].minimum_amount:
-            messages.warning(request,'Minimum amount should be {}'.format(coupon_obj[0].minimum_amount))
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            messages.warning(request,'Minimum amount should be {} to gain discounts'.format(coupon_obj[0].minimum_amount))
+        #     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         if coupon_obj[0].is_expired:
             messages.warning(request,'Coupon already expired')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -107,7 +107,7 @@ def add_to_cart(request,uid):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 def remove_coupon(request,cart_id):
-    cart_obj=Cart.objects.filter(user=cart_id,is_paid=False)
+    cart_obj=Cart.objects.get(uid=cart_id)
     cart_obj.coupon=None
     cart_obj.save()
     messages.success(request,'Coupon removed successfully')

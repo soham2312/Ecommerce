@@ -30,7 +30,10 @@ class Cart(BaseModel):
             price.append(cart_item.get_product_price())
         print(self.coupon)
         if self.coupon:
-            return sum(price)-self.coupon.discount*sum(price)/100    
+            if self.coupon.minimum_amount<sum(price):
+                return sum(price)-self.coupon.discount*sum(price)/100 
+            else:
+                return sum(price)   
         return sum(price)
 
 class Cartitems(BaseModel):
